@@ -91,7 +91,8 @@ details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-to
 <div class="tools">
 <details class="tool"><summary>내 답안 양식 · 불러오기 · 저장</summary>
   <p style="margin:6px 0 0;font-size:.85em;opacity:.75">답안은 txt 파일을 불러오거나, 아래 박스에 입력 후 '박스 내용으로 입력' 버튼으로 불러올 수 있습니다.</p>
-  <div class="row2"><button class="chipbtn" id="tpl">빈 txt 양식 받기</button><label class="chipbtn">txt 파일으로 입력<input type="file" id="ansfile" accept=".txt,text/plain" hidden></label><button class="chipbtn" id="imp">박스 내용으로 입력</button><button class="chipbtn" id="exp">내 답안 txt 저장</button><button class="chipbtn" id="reset">판정·답안 지우기</button></div>
+  <p style="margin:2px 0 0;font-size:.85em;opacity:.75">txt 파일은 답안뿐만 아니라 판정을 함께 저장하고, 불러올 수 있습니다.</p>
+  <div class="row2"><button class="chipbtn" id="tpl">빈 txt 양식 받기</button><label class="chipbtn">txt 파일으로 입력<input type="file" id="ansfile" accept=".txt,text/plain" hidden></label><button class="chipbtn" id="imp">박스 내용으로 입력</button><button class="chipbtn" id="exp">내 답안 txt 저장</button><button class="chipbtn" id="reset">답안·판정 지우기</button></div>
   <textarea id="paste"></textarea>
 </details>
 <details class="tool" id="filebox" hidden><summary>데이터 파일 직접 열기</summary>
@@ -233,7 +234,8 @@ function answersText(blank){
   list.forEach(q=>{
     const k=idKey(q.id),n=k.split('-')[0];
     if(q.form!==form||n!==qn){form=q.form;qn=n;const lb=(subjects.find(s=>s.subject===q.sub)||{}).label||'';out+=`\n${form}형 ${n}번 (${lb})`}
-    out+=`\n  ${k}: ${blank?'':String(S.m[q.id]||'').replace(/\r?\n/g,'\\n')}`;
+    const jm={O:'○',T:'△',X:'✕'}[S.j[q.id]];
+    out+=`\n  ${k}: ${blank?'':String(S.m[q.id]||'').replace(/\r?\n/g,'\\n')}${!blank&&jm?` [${jm}]`:''}`;
   });
   return out+'\n';
 }
@@ -244,21 +246,24 @@ function download(name,text){
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 function importText(txt){
-  let form='',n=0;
+  let form='',n=0,nj=0;
   txt.replace(/^\uFEFF/,'').split(/\r?\n/).forEach(l=>{
     let m=l.match(/^\s*([AB])형\s*\d+번/);if(m){form=m[1];return}
     m=l.match(/^\s*(\d+(?:-\d+)+):\s*(.*)$/);if(!m||!form)return;
-    const v=m[2].trim().replace(/\\n/g,'\n');if(!v)return;
+    let raw=m[2],jk='';
+    const jm=raw.match(/\s*\[([○△✕])\]\s*$/);
+    if(jm){jk={'○':'O','△':'T','✕':'X'}[jm[1]];raw=raw.slice(0,jm.index)}
+    const v=raw.trim().replace(/\\n/g,'\n');if(!v&&!jk)return;
     const k=form+'-'+m[1];
-    items.forEach(q=>{if(q.id===k||q.id.startsWith(k+'-')){S.m[q.id]=v;n++}});
+    items.forEach(q=>{if(q.id===k||q.id.startsWith(k+'-')){if(v){S.m[q.id]=v;n++}if(jk){S.j[q.id]=jk;nj++}}});
   });
-  save();render();alert(n+'개 카드에 답안을 넣었습니다.');
+  save();render();alert(n+'개 카드에 답안, '+nj+'개 카드에 판정을 넣었습니다.');
 }
 document.getElementById('imp').onclick=()=>importText(document.getElementById('paste').value);
 document.getElementById('tpl').onclick=()=>{if(!items.length)return alert('데이터가 아직 로드되지 않았습니다.');download('가채점_양식.txt',answersText(true))};
 document.getElementById('exp').onclick=()=>{if(!items.length)return alert('데이터가 아직 로드되지 않았습니다.');download('내_답안.txt',answersText(false))};
 document.getElementById('ansfile').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importText);e.target.value=''};
-document.getElementById('reset').onclick=()=>{if(confirm('판정과 내 답안을 모두 지울까요?')){S={j:{},m:{}};save();render()}};
+document.getElementById('reset').onclick=()=>{if(confirm('내 답안과 판정을 모두 지울까요?')){S={j:{},m:{}};save();render()}};
 document.getElementById('file').onchange=e=>{
   [...e.target.files].forEach(f=>f.text().then(t=>{addSubject(JSON.parse(t));render()}));
 };
