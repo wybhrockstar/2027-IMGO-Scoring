@@ -53,9 +53,10 @@ details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-to
 .qbox .intro{margin-bottom:4px;color:var(--sub);font-size:13px}
 .qbox .intro b{color:var(--ink)}
 .pgbtn{margin-top:6px}
-.pages{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.pages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:8px}
 .pages[hidden]{display:none}
-.pages img{flex:1 1 420px;max-width:780px;height:auto;border:1px solid var(--line);background:#fff}
+.pages .nopg{grid-column:1/-1}
+.pages img{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--line);background:#fff}
 .nopg{color:var(--m4);font-size:12.5px}
 .body{display:grid;grid-template-columns:300px 1fr}
 .mine{padding:10px 14px;background:var(--soft);border-right:1px solid var(--line)}
@@ -99,7 +100,7 @@ main{padding:0 12px 40px}
 .bar{transition:transform .22s ease;will-change:transform}
 .bar.hide{transform:translateY(-100%)}
 }
-@media (max-width:900px){.body{grid-template-columns:1fr}.mine{border-right:0;border-bottom:1px solid var(--line)}.src{grid-template-columns:1fr}}
+@media (max-width:900px){.pages{grid-template-columns:minmax(0,1fr)}.body{grid-template-columns:1fr}.mine{border-right:0;border-bottom:1px solid var(--line)}.src{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
