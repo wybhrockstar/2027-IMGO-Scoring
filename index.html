@@ -90,9 +90,9 @@ details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-to
 
 <div class="tools">
 <details class="tool"><summary>내 답안 양식 · 불러오기 · 저장</summary>
-  <div class="row2"><button class="chipbtn" id="tpl">빈 양식 받기 (.txt)</button><button class="chipbtn" id="exp">내 답안 저장 (.txt)</button><label class="chipbtn">txt 파일 불러오기<input type="file" id="ansfile" accept=".txt,text/plain" hidden></label></div>
-  <textarea id="paste" placeholder="A형 1번 (국어)&#10;  1-1-1: 답안&#10;  1-1-2: 답안&#10;&#10;(txt 내용을 여기에 붙여넣고 아래 버튼으로 불러와도 됩니다)"></textarea>
-  <div class="row2"><button class="chipbtn" id="imp">붙여넣은 답안 불러오기</button><button class="chipbtn" id="reset">판정·답안 모두 지우기</button></div>
+  <p style="margin:6px 0 0;font-size:.85em;opacity:.75">답안은 txt 파일을 불러오거나, 아래 박스에 입력 후 '박스 내용으로 입력' 버튼으로 불러올 수 있습니다.</p>
+  <div class="row2"><button class="chipbtn" id="tpl">빈 txt 양식 받기</button><label class="chipbtn">txt 파일으로 입력<input type="file" id="ansfile" accept=".txt,text/plain" hidden></label><button class="chipbtn" id="imp">박스 내용으로 입력</button><button class="chipbtn" id="exp">내 답안 txt 저장</button><button class="chipbtn" id="reset">판정·답안 지우기</button></div>
+  <textarea id="paste"></textarea>
 </details>
 <details class="tool" id="filebox" hidden><summary>데이터 파일 직접 열기</summary>
   <div class="row2"><input type="file" id="file" accept=".json" multiple></div>
@@ -261,6 +261,7 @@ document.getElementById('file').onchange=e=>{
 Promise.all(NAMES.map(n=>fetch('data/'+n+'.json').then(r=>r.ok?r.json():null).catch(()=>null))).then(ds=>{
   ds.forEach(addSubject);
   if(!items.length)document.getElementById('filebox').hidden=false;
+  else{const pb=document.getElementById('paste');if(!pb.value)pb.value=answersText(true)}
   render();
 });
 </script>
