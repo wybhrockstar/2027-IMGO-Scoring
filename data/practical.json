@@ -346,6 +346,8 @@
       "part": "②",
       "points": 1,
       "points_estimated": false,
+      "dispute": true,
+      "dispute_note": "쟁점: '클래스'가 키워드로 포함되어야 하는지",
       "answers": [
         {
           "src": "bg",
