@@ -48,7 +48,7 @@ details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-to
 .body{display:grid;grid-template-columns:300px 1fr}
 .mine{padding:10px 14px;background:var(--soft);border-right:1px solid var(--line)}
 .mine label{font-size:12px;color:var(--sub);display:block;margin-bottom:4px}
-.mine textarea{width:100%;min-height:74px;resize:vertical;border:1px solid var(--line);border-radius:4px;background:var(--card);padding:6px 8px}
+.mine textarea{width:100%;min-height:74px;max-height:260px;overflow-y:auto;resize:none;border:1px solid var(--line);border-radius:4px;background:var(--card);padding:6px 8px}
 .judge{display:flex;gap:6px;margin-top:8px}
 .judge button{flex:1;height:36px;border:1px solid var(--line);background:var(--card);border-radius:4px;font-size:16px;font-weight:700;cursor:pointer}
 .judge button[aria-pressed=true]{background:var(--sel);color:var(--selt);border-color:var(--sel)}
@@ -198,6 +198,7 @@ function render(){
   if(filter==='dispute')list=list.filter(dispute);
   if(filter==='open')list=list.filter(q=>!S.j[q.id]);
   document.getElementById('cards').innerHTML=list.length?list.map(cardHTML).join(''):'<div class="empty">조건에 맞는 문항이 없습니다.</div>';
+  autosizeAll();
   summary();
 }
 function addSubject(d){
@@ -221,7 +222,10 @@ document.addEventListener('click',e=>{
   else if(t.dataset.v){view=t.dataset.v;render()}
   else if(t.dataset.f){filter=t.dataset.f;render()}
 });
-document.addEventListener('input',e=>{if(e.target.dataset.id&&e.target.tagName==='TEXTAREA'){S.m[e.target.dataset.id]=e.target.value;save()}});
+function autosize(el){el.style.height='auto';el.style.height=(el.scrollHeight+(el.offsetHeight-el.clientHeight))+'px'}
+function autosizeAll(){document.querySelectorAll('.mine textarea').forEach(autosize)}
+window.addEventListener('resize',autosizeAll);
+document.addEventListener('input',e=>{if(e.target.dataset.id&&e.target.tagName==='TEXTAREA'){S.m[e.target.dataset.id]=e.target.value;save();autosize(e.target)}});
 const idKey=id=>id.split('-').slice(1).join('-');
 function answersText(blank){
   const list=[...items].sort((a,b)=>a.form.localeCompare(b.form)||idKey(a.id).localeCompare(idKey(b.id),undefined,{numeric:true}));
