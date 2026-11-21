@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>2027 초등 임용 1차 가채점</title>
+<title>2027 IMGO Scoring</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
 :root{--bg:#eef1f5;--card:#fff;--ink:#17202c;--sub:#5d6b7c;--line:#d5dce5;--soft:#f4f6f9;--m1:#0d6e6e;--m2:#2a7d3f;--m3:#a86400;--m4:#b3261e;--sel:#17202c;--selt:#fff}
@@ -61,6 +61,7 @@ details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-to
 .mk{font-size:15px;font-weight:700;flex:none;width:1.3em;text-align:center}
 .mk1{color:var(--m1)}.mk2{color:var(--m2)}.mk3{color:var(--m3)}.mk4{color:var(--m4)}.mk5{color:var(--sub)}
 .ans{white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+.aimg{display:block;max-width:100%;height:auto;margin-top:6px;border:1px solid var(--line);background:#fff}
 .ans small{display:block;color:var(--m4);font-size:11.5px}
 .nt{font-size:13px;color:var(--sub);white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
 .nt .blk+.blk{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}
@@ -75,7 +76,7 @@ details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-to
 </head>
 <body>
 <main>
-<h1>2027 초등 임용 1차 가채점</h1>
+<h1>2027 IMGO Scoring</h1>
 <div class="top">출처별 모범답안과 인정 범위를 비교하고, 내 답안을 ○ △ ✕로 판정하면 점수 범위가 계산됩니다.</div>
 
 <div class="bar">
@@ -118,16 +119,17 @@ function groups(q){
   return ORDER.map(s=>({s,rows:q.answers.filter(a=>a.src===s)})).filter(g=>g.rows.length);
 }
 // 출처 1개 = 한 블록: 출처명 1회 | 답안 칸(◎·○) | 비고 칸(note·cond·△·✕·ref, 중복 문장은 1번만)
+const imgHTML=a=>a.image?`<img class="aimg" src="${esc(a.image)}" alt="그림 답안" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'nopg',textContent:'그림 파일을 찾지 못했습니다: '+this.getAttribute('src')}))">`:'';
 function srcHTML(gr){
   const lead=gr.rows.filter(a=>a.mk==='◎'||a.mk==='○'||a.mk==='—');
   const side=gr.rows.filter(a=>a.mk==='△'||a.mk==='✕');
-  const ans=lead.length?lead.map(a=>`<div class="a"><b class="mk mk${MK[a.mk]}">${a.mk}</b><div class="ans">${esc(a.text)||'—'}</div></div>`).join('')
+  const ans=lead.length?lead.map(a=>`<div class="a"><b class="mk mk${MK[a.mk]}">${a.mk}</b><div class="ans">${a.image&&(a.text||'').trim()==='[그림]'?'':esc(a.text)||'—'}${imgHTML(a)}</div></div>`).join('')
     :`<div class="a"><b class="mk mk5">—</b><div class="ans"></div></div>`;
   const blocks=[],seen=new Set();
   const add=t=>{t=(t||'').trim();if(t&&!seen.has(t)){seen.add(t);blocks.push(t)}};
   lead.forEach(a=>add(a.note));
   let nt=blocks.map(b=>`<div class="blk">${esc(b)}</div>`).join('');
-  nt+=side.map(a=>`<div class="blk ex"><b class="mk mk${MK[a.mk]}">${a.mk}</b><div>${esc(a.text)}${a.note?`\n${esc(a.note)}`:''}${a.cond?`<small>조건: ${esc(a.cond)}</small>`:''}</div></div>`).join('');
+  nt+=side.map(a=>`<div class="blk ex"><b class="mk mk${MK[a.mk]}">${a.mk}</b><div>${esc(a.text)}${imgHTML(a)}${a.note?`\n${esc(a.note)}`:''}${a.cond?`<small>조건: ${esc(a.cond)}</small>`:''}</div></div>`).join('');
   const refs=[...new Set(gr.rows.map(a=>a.ref).filter(Boolean))];
   if(refs.length)nt+=`<small class="ref">${refs.map(esc).join(' / ')}</small>`;
   if(!nt)nt='<span class="none">—</span>';
@@ -142,13 +144,13 @@ function qHTML(q){
 }
 function cardHTML(q){
   let h=`<section class="card" data-id="${q.id}"><div class="head"><div class="title"><b>${esc(q.label)}</b><span>${q.points}점${q.points_estimated?' (배점 추정)':''}</span>${dispute(q)?'<span class="tag t-d">쟁점</span>':''}</div>${dispute(q)&&q.dispute_note?`<div class="dn">${esc(q.dispute_note)}</div>`:''}</div>${qHTML(q)}<div class="body">`;
-  h+=`<div class="mine"><label for="m-${q.id}">내 답안</label><textarea id="m-${q.id}" data-id="${q.id}">${esc(S.m[q.id]||'')}</textarea><div class="judge">${[['O','○'],['T','△'],['X','✕']].map(([k,l])=>`<button data-id="${q.id}" data-j="${k}" aria-pressed="${S.j[q.id]===k}" aria-label="${l} 판정">${l}</button>`).join('')}</div></div>`;
+  h+=`<div class="mine"><label for="m-${q.id}">내 답안</label><textarea id="m-${q.id}" data-id="${q.id}">${esc(S.m[q.id]||'')}</textarea><div class="judge">${[['O','○'],['T','△'],['X','✕']].map(([k,l])=>{const pt=q.partial!=null;const t=pt&&k==='O'?`○ (${q.points}점)`:pt&&k==='T'?`△ (${q.partial}점)`:l;return `<button data-id="${q.id}" data-j="${k}" aria-pressed="${S.j[q.id]===k}" aria-label="${l} 판정">${t}</button>`}).join('')}</div></div>`;
   h+=`<div class="srcs">${groups(q).map(srcHTML).join('')}</div></div></section>`;
   return h;
 }
 function pts(list){
   let mn=0,mx=0,done=0;
-  list.forEach(q=>{const j=S.j[q.id];if(!j)return;done++;if(j==='O'){mn+=q.points;mx+=q.points}else if(j==='T')mx+=q.points});
+  list.forEach(q=>{const j=S.j[q.id];if(!j)return;done++;if(j==='O'){mn+=q.points;mx+=q.points}else if(j==='T'){if(q.partial!=null){mn+=q.partial;mx+=q.partial}else mx+=q.points}});
   return {mn,mx,done,n:list.length,tot:list.reduce((a,q)=>a+q.points,0)};
 }
 function summary(){
