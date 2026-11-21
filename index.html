@@ -101,7 +101,7 @@ details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-to
 </div>
 
 <div id="cards"></div>
-<div class="foot">마지막 문항까지 판정하면 익명 통계용으로 점수·판정과 접속 IP 주소 및 추정 지역이 집계됩니다(이름·답안 텍스트 제외).</div>
+<div class="foot"></div>
 </main>
 <script>
 const NAMES=['korean','english','chongchang','social','moral','practical','math','art','integrated','science','music','pe'];
@@ -109,7 +109,7 @@ const SRC={bg:'백구',wi:'위더스',ku:'쿠키넷',te:'테크니컬',im:'임�
 const ORDER=['bg','wi','ku','te','im'];
 const MK={'◎':1,'○':2,'△':3,'✕':4,'—':5};
 const KEY='gachejeom_v1';
-const COLLECT_URL=''; // Apps Script 웹앱 URL을 여기에 붙여넣기 (비워 두면 전송 안 함)
+const COLLECT_URL='https://script.google.com/macros/s/AKfycbxNZqJRCm74MPElegBUQ2_vpThVGyBk9raOuPpRS-ucv5gOEm__RxY9DJ0IbDEF_RU8/exec'; // Apps Script 웹앱 URL을 여기에 붙여넣기 (비워 두면 전송 안 함)
 const UID_KEY='gachejeom_uid',SENT_KEY='gachejeom_sent';
 let subjects=[],items=[],view='all',filter='all';
 const QS={},OPEN=new Set(),PGDIR='assets/exam/';
