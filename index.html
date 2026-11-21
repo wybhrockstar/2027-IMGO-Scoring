@@ -70,6 +70,7 @@ details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-to
 .nt .ex .mk{font-size:14px}
 .nt .ref{display:block;font-size:11px;opacity:.7;margin-top:6px}
 .nt .none{opacity:.5}
+.foot{margin-top:28px;color:var(--sub);font-size:12px;text-align:center}
 .empty{color:var(--sub);padding:30px 0;text-align:center}
 @media (max-width:900px){.body{grid-template-columns:1fr}.mine{border-right:0;border-bottom:1px solid var(--line)}.src{grid-template-columns:1fr}}
 </style>
@@ -100,6 +101,7 @@ details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-to
 </div>
 
 <div id="cards"></div>
+<div class="foot">마지막 문항까지 판정하면 익명 통계용으로 점수·판정과 접속 IP 주소 및 추정 지역이 집계됩니다(이름·답안 텍스트 제외).</div>
 </main>
 <script>
 const NAMES=['korean','english','chongchang','social','moral','practical','math','art','integrated','science','music','pe'];
@@ -107,6 +109,8 @@ const SRC={bg:'백구',wi:'위더스',ku:'쿠키넷',te:'테크니컬',im:'임�
 const ORDER=['bg','wi','ku','te','im'];
 const MK={'◎':1,'○':2,'△':3,'✕':4,'—':5};
 const KEY='gachejeom_v1';
+const COLLECT_URL=''; // Apps Script 웹앱 URL을 여기에 붙여넣기 (비워 두면 전송 안 함)
+const UID_KEY='gachejeom_uid',SENT_KEY='gachejeom_sent';
 let subjects=[],items=[],view='all',filter='all';
 const QS={},OPEN=new Set(),PGDIR='assets/exam/';
 const pgSrc=id=>PGDIR+id+'.jpg';
@@ -154,6 +158,31 @@ function pts(list){
   list.forEach(q=>{const j=S.j[q.id];if(!j)return;done++;if(j==='O'){mn+=q.points;mx+=q.points}else if(j==='T'){if(q.partial!=null){mn+=q.partial;mx+=q.partial}else mx+=q.points}});
   return {mn,mx,done,n:list.length,tot:list.reduce((a,q)=>a+q.points,0)};
 }
+let sendT,geoP;
+const lastItemId=()=>{const l=[...items].sort((a,b)=>a.form.localeCompare(b.form)||idKey(a.id).localeCompare(idKey(b.id),undefined,{numeric:true}));return l.length?l[l.length-1].id:null};
+const getGeo=()=>geoP||(geoP=(async()=>{
+  try{const c=new AbortController(),tm=setTimeout(()=>c.abort(),3000);
+    const r=await fetch('https://ipwho.is/',{signal:c.signal});clearTimeout(tm);
+    const d=await r.json();return d&&d.success!==false?{ip:String(d.ip||''),region:String(d.region||'')}:{ip:'',region:''};
+  }catch(e){return {ip:'',region:''}}
+})());
+// 마지막 문항(정렬상 맨 끝)을 판정하면 최초 전송, 이후에는 판정이 바뀔 때마다 같은 행을 갱신
+function collect(id){
+  if(!COLLECT_URL||!items.length)return;
+  let u,last;
+  try{u=localStorage.getItem(UID_KEY);last=localStorage.getItem(SENT_KEY)}catch(e){return}
+  if(!last&&!(id===lastItemId()&&S.j[id]))return;
+  if(!u){try{u=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2));localStorage.setItem(UID_KEY,u)}catch(e){return}}
+  clearTimeout(sendT);
+  sendT=setTimeout(async()=>{
+    const p=pts(items),j={};items.forEach(q=>{if(S.j[q.id])j[q.id]=S.j[q.id]});
+    const g=await getGeo();if(!g.ip)geoP=null;
+    const body=JSON.stringify({uid:u,min:p.mn,max:p.mx,ip:g.ip,region:g.region,j});
+    try{if(body===localStorage.getItem(SENT_KEY))return}catch(e){}
+    fetch(COLLECT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body})
+      .then(()=>{try{localStorage.setItem(SENT_KEY,body)}catch(e){}}).catch(()=>{});
+  },1500);
+}
 function summary(){
   const cur=view==='all'?items:items.filter(q=>q.sub===view);
   const p=pts(cur);
@@ -187,7 +216,7 @@ document.addEventListener('click',e=>{
     if(open){OPEN.add(id);box.querySelectorAll('img[data-src]').forEach(i=>{i.src=i.dataset.src;i.removeAttribute('data-src')})}else OPEN.delete(id);
     t.setAttribute('aria-expanded',open);t.textContent=(open?'시험지 접기':'시험지 보기')+' ('+box.children.length+'쪽)';
   }
-  else if(t.dataset.j){const id=t.dataset.id;S.j[id]=S.j[id]===t.dataset.j?undefined:t.dataset.j;if(!S.j[id])delete S.j[id];save();
+  else if(t.dataset.j){const id=t.dataset.id;S.j[id]=S.j[id]===t.dataset.j?undefined:t.dataset.j;if(!S.j[id])delete S.j[id];save();collect(id);
     t.parentNode.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',S.j[id]===b.dataset.j));summary();if(filter==='open')render();}
   else if(t.dataset.v){view=t.dataset.v;render()}
   else if(t.dataset.f){filter=t.dataset.f;render()}
