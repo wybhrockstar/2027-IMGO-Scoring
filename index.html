@@ -5,20 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>2027 IMGO Scoring</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<script>try{if(localStorage.getItem('gachejeom_theme')==='light')document.documentElement.dataset.theme='light'}catch(e){}</script>
 <style>
-:root{--bg:#eef1f5;--card:#fff;--ink:#17202c;--sub:#5d6b7c;--line:#d5dce5;--soft:#f4f6f9;--m1:#0d6e6e;--m2:#2a7d3f;--m3:#a86400;--m4:#b3261e;--sel:#17202c;--selt:#fff}
-@media (prefers-color-scheme:dark){:root{--bg:#10151c;--card:#19212b;--ink:#e8edf3;--sub:#9aa8b8;--line:#2c3744;--soft:#212b37;--m1:#4fc3c3;--m2:#6fcf8a;--m3:#f0b04d;--m4:#ff8a80;--sel:#e8edf3;--selt:#10151c}}
+:root{color-scheme:dark;--bg:#10151c;--card:#19212b;--ink:#e8edf3;--sub:#9aa8b8;--line:#2c3744;--soft:#212b37;--m1:#4fc3c3;--m2:#6fcf8a;--m3:#f0b04d;--m4:#ff8a80;--sel:#e8edf3;--selt:#10151c}
+:root[data-theme=light]{color-scheme:light;--bg:#eef1f5;--card:#fff;--ink:#17202c;--sub:#5d6b7c;--line:#d5dce5;--soft:#f4f6f9;--m1:#0d6e6e;--m2:#2a7d3f;--m3:#a86400;--m4:#b3261e;--sel:#17202c;--selt:#fff}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:15px/1.6 'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif}
 main{max-width:1600px;margin:0 auto;padding:0 24px 60px}
-h1{font-size:20px;margin:18px 0 2px}
+h1{font-size:20px;margin:0}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 2px}
+#theme{font-size:16px;line-height:1;padding:5px 9px}
 .top{color:var(--sub);font-size:13px;margin-bottom:10px}
 .bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);display:flex;gap:28px;align-items:center;flex-wrap:wrap}
 .sum{display:flex;gap:24px;align-items:baseline}
 .sum b{font-size:22px}.sum span{font-size:12px;color:var(--sub);display:block}
 .tabs,.filters{display:flex;gap:6px;flex-wrap:wrap}
 .ctl{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+.subrow{display:none;gap:6px;align-items:center}
+.dd{position:relative;display:inline-block}
+.dd select{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:2px 26px 2px 12px;font-size:12.5px;cursor:pointer;height:100%}
+.dd select option{background:var(--card);color:var(--ink)}
+.dd::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:11px;color:var(--sub)}
+.dd.on select{background:var(--sel);color:var(--selt);border-color:var(--sel)}
+.dd.on::after{color:var(--selt)}
 .filters .sep{width:1px;background:var(--line);margin:2px 4px}
 .chipbtn .pt{pointer-events:none;opacity:.7;font-size:.9em;margin-left:3px}
 button,select,textarea,input{font:inherit;color:inherit}
@@ -74,17 +84,33 @@ details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-to
 .nt .none{opacity:.5}
 .foot{margin-top:28px;color:var(--sub);font-size:12px;text-align:center}
 .empty{color:var(--sub);padding:30px 0;text-align:center}
+@media (max-width:700px){
+main{padding:0 12px 40px}
+.bar{flex-direction:column;align-items:stretch;gap:6px;padding:6px 0}
+.sum{gap:8px;justify-content:space-between}
+.sum b{font-size:17px;line-height:1.3}.sum span{font-size:10.5px;line-height:1.3;white-space:nowrap}
+.ctl{gap:5px;flex:none}
+.tabs{display:none}
+.subrow{display:flex}
+.filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.filters::-webkit-scrollbar{display:none}
+.subrow .chipbtn,.filters .chipbtn{flex:none;white-space:nowrap;padding:2px 10px;font-size:12.5px}
+.filters .sep{flex:none}
+.bar{transition:transform .22s ease;will-change:transform}
+.bar.hide{transform:translateY(-100%)}
+}
 @media (max-width:900px){.body{grid-template-columns:1fr}.mine{border-right:0;border-bottom:1px solid var(--line)}.src{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <main>
-<h1>2027 IMGO Scoring</h1>
+<div class="hd"><h1>2027 IMGO Scoring</h1><button class="chipbtn" id="theme" type="button"></button></div>
 <div class="top">출처별 모범답안과 인정 범위를 비교하고, 내 답안을 ○ △ ✕로 판정하면 점수 범위가 계산됩니다.</div>
 
 <div class="bar">
   <div class="sum" id="sum"></div>
   <div class="ctl">
+    <div class="subrow" id="subrow"></div>
     <div class="tabs" id="tabs"></div>
     <div class="filters" id="filters"></div>
   </div>
@@ -109,6 +135,20 @@ details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-to
 <div class="foot"></div>
 </main>
 <script>
+// 모바일: 아래로 스크롤하면 상단 바를 숨기고, 위로 올리면 다시 보여줌 (CSS는 700px 이하에서만 적용)
+(()=>{const bar=document.querySelector('.bar');let last=0,tick=false;
+  addEventListener('scroll',()=>{if(tick)return;tick=true;requestAnimationFrame(()=>{
+    tick=false;const y=Math.max(0,scrollY),d=y-last;
+    if(y<=bar.offsetHeight)bar.classList.remove('hide');
+    else if(d>6&&!/^(TEXTAREA|SELECT|INPUT)$/.test(document.activeElement.tagName))bar.classList.add('hide');
+    else if(d<-6)bar.classList.remove('hide');
+    if(Math.abs(d)>6)last=y;
+  })},{passive:true});
+})();
+const THEME_KEY='gachejeom_theme';
+function paintTheme(){const l=document.documentElement.dataset.theme==='light',b=document.getElementById('theme');b.textContent=l?'☀️':'🌙';b.title=b.ariaLabel=l?'라이트 모드 (눌러서 다크 모드로)':'다크 모드 (눌러서 라이트 모드로)'}
+document.getElementById('theme').onclick=()=>{const l=document.documentElement.dataset.theme!=='light';if(l)document.documentElement.dataset.theme='light';else delete document.documentElement.dataset.theme;try{localStorage.setItem(THEME_KEY,l?'light':'dark')}catch(e){}paintTheme()};
+paintTheme();
 const NAMES=['korean','english','chongchang','social','moral','practical','math','art','integrated','science','music','pe'];
 const SRC={bg:'백구',wi:'위더스',ku:'쿠키넷',te:'테크니컬',im:'임고트'};
 const ORDER=['bg','wi','ku','te','im'];
@@ -199,6 +239,8 @@ function summary(){
 function render(){
   const tabs=[['all','전체'],...subjects.map(s=>[s.subject,s.label])];
   document.getElementById('tabs').innerHTML=tabs.map(([k,l])=>`<button class="chipbtn" data-v="${k}" aria-pressed="${view===k}">${l}${SUBPT[k]!=null?`<span class="pt">${SUBPT[k]}점</span>`:''}</button>`).join('');
+  const cur=subjects.find(x=>x.subject===view);
+  document.getElementById('subrow').innerHTML=`<button class="chipbtn" data-v="all" aria-pressed="${view==='all'}">전체</button><span class="dd${cur?' on':''}"><select id="subsel" aria-label="과목 선택"><option value="" disabled${cur?'':' selected'}>과목 선택</option>${subjects.map(x=>`<option value="${x.subject}"${view===x.subject?' selected':''}>${x.label} ${SUBPT[x.subject]}점</option>`).join('')}</select></span>`;
   const fb=(k,l,on)=>`<button class="chipbtn" data-f="${k}" aria-pressed="${on}">${l}</button>`;
   document.getElementById('filters').innerHTML=fb('all','전체',vset.size===3)+fb('O','○',vset.has('O'))+fb('T','△',vset.has('T'))+fb('X','✕',vset.has('X'))+'<span class="sep"></span>'+fb('dispute','쟁점만',fDis)+fb('open','미판정만',fOpen);
   let list=view==='all'?items:items.filter(q=>q.sub===view);
@@ -238,6 +280,7 @@ document.addEventListener('click',e=>{
     render();
   }
 });
+document.addEventListener('change',e=>{if(e.target.id==='subsel'&&e.target.value){view=e.target.value;render()}});
 function autosize(el){el.style.height='auto';el.style.height=(el.scrollHeight+(el.offsetHeight-el.clientHeight))+'px'}
 function autosizeAll(){document.querySelectorAll('.mine textarea').forEach(autosize)}
 window.addEventListener('resize',autosizeAll);
