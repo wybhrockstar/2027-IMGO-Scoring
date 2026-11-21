@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2027 초등 임용 1차 가채점</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#eef1f5;--card:#fff;--ink:#17202c;--sub:#5d6b7c;--line:#d5dce5;--soft:#f4f6f9;--m1:#0d6e6e;--m2:#2a7d3f;--m3:#a86400;--m4:#b3261e;--sel:#17202c;--selt:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#10151c;--card:#19212b;--ink:#e8edf3;--sub:#9aa8b8;--line:#2c3744;--soft:#212b37;--m1:#4fc3c3;--m2:#6fcf8a;--m3:#f0b04d;--m4:#ff8a80;--sel:#e8edf3;--selt:#10151c}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif}
+main{max-width:1600px;margin:0 auto;padding:0 24px 60px}
+h1{font-size:20px;margin:18px 0 2px}
+.top{color:var(--sub);font-size:13px;margin-bottom:10px}
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);display:flex;gap:28px;align-items:center;flex-wrap:wrap}
+.sum{display:flex;gap:24px;align-items:baseline}
+.sum b{font-size:22px}.sum span{font-size:12px;color:var(--sub);display:block}
+.tabs,.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters{margin-left:auto}
+button,select,textarea,input{font:inherit;color:inherit}
+.chipbtn{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:3px 12px;font-size:13px;cursor:pointer}
+.chipbtn[aria-pressed=true]{background:var(--sel);color:var(--selt);border-color:var(--sel)}
+:focus-visible{outline:2px solid var(--m1);outline-offset:2px}
+.legend{font-size:12px;color:var(--sub);margin:8px 0}
+.legend i{font-style:normal;font-weight:700}
+.tools{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+details.tool{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 12px;margin:6px 0;font-size:13px}
+details.tool textarea{width:min(640px,80vw);height:110px;display:block;margin-top:8px;border:1px solid var(--line);border-radius:4px;background:var(--soft);padding:6px}
+.row2{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;margin:12px 0;overflow:hidden}
+.head{padding:8px 14px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
+.title{display:flex;gap:8px;align-items:baseline}
+.title b{font-size:16px}
+.tag{font-size:11px;border-radius:3px;padding:0 6px;border:1px solid}
+.t-d{color:var(--m3);border-color:var(--m3)}
+.dn{flex-basis:100%;font-size:12.5px;color:var(--m3);white-space:pre-line}
+.qbox{padding:8px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
+.qbox .stem{white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+.qbox .intro{margin-bottom:4px;color:var(--sub);font-size:13px}
+.qbox .intro b{color:var(--ink)}
+.pgbtn{margin-top:6px}
+.pages{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.pages[hidden]{display:none}
+.pages img{flex:1 1 420px;max-width:780px;height:auto;border:1px solid var(--line);background:#fff}
+.nopg{color:var(--m4);font-size:12.5px}
+.body{display:grid;grid-template-columns:300px 1fr}
+.mine{padding:10px 14px;background:var(--soft);border-right:1px solid var(--line)}
+.mine label{font-size:12px;color:var(--sub);display:block;margin-bottom:4px}
+.mine textarea{width:100%;min-height:74px;resize:vertical;border:1px solid var(--line);border-radius:4px;background:var(--card);padding:6px 8px}
+.judge{display:flex;gap:6px;margin-top:8px}
+.judge button{flex:1;height:36px;border:1px solid var(--line);background:var(--card);border-radius:4px;font-size:16px;font-weight:700;cursor:pointer}
+.judge button[aria-pressed=true]{background:var(--sel);color:var(--selt);border-color:var(--sel)}
+.srcs{min-width:0}
+.src{display:grid;grid-template-columns:76px minmax(0,1fr) minmax(0,1.5fr);gap:14px;padding:8px 14px;border-top:1px solid var(--line)}
+.src:first-child{border-top:0}
+.who{font-size:13px;font-weight:700;padding-top:1px}
+.a{display:flex;gap:6px;align-items:baseline;padding:2px 0}
+.a+.a{border-top:1px dashed var(--line);margin-top:4px;padding-top:6px}
+.mk{font-size:15px;font-weight:700;flex:none;width:1.3em;text-align:center}
+.mk1{color:var(--m1)}.mk2{color:var(--m2)}.mk3{color:var(--m3)}.mk4{color:var(--m4)}.mk5{color:var(--sub)}
+.ans{white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+.ans small{display:block;color:var(--m4);font-size:11.5px}
+.nt{font-size:13px;color:var(--sub);white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+.nt .blk+.blk{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}
+.nt small{display:block;font-size:11.5px;margin-top:4px}
+.nt .ex{display:flex;gap:6px;align-items:baseline}
+.nt .ex .mk{font-size:14px}
+.nt .ref{display:block;font-size:11px;opacity:.7;margin-top:6px}
+.nt .none{opacity:.5}
+.empty{color:var(--sub);padding:30px 0;text-align:center}
+@media (max-width:900px){.body{grid-template-columns:1fr}.mine{border-right:0;border-bottom:1px solid var(--line)}.src{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>2027 초등 임용 1차 가채점</h1>
+<div class="top">출처별 모범답안과 인정 범위를 비교하고, 내 답안을 ○ △ ✕로 판정하면 점수 범위가 계산됩니다.</div>
+
+<div class="bar">
+  <div class="sum" id="sum"></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="filters" id="filters"></div>
+</div>
+
+<div class="legend"><i class="mk1">◎</i> 모범 <i class="mk2">○</i> 인정 (좌: 답안) · <i class="mk3">△</i> 조건부 <i class="mk4">✕</i> 불인정 (우: 비고) · <i class="mk5">—</i> 언급 없음 · 마커는 출처의 표시이고, 카드의 ○ △ ✕는 내 답안에 매기는 판정입니다.</div>
+
+<div class="tools">
+<details class="tool"><summary>내 답안 붙여넣기</summary>
+  <textarea id="paste" placeholder="A형 1번 (국어)&#10;  1-1-1: 답안&#10;  1-1-2: 답안"></textarea>
+  <div class="row2"><button class="chipbtn" id="imp">답안 불러오기</button><button class="chipbtn" id="reset">판정·답안 모두 지우기</button></div>
+</details>
+<details class="tool" id="filebox" hidden><summary>데이터 파일 직접 열기</summary>
+  <div class="row2"><input type="file" id="file" accept=".json" multiple></div>
+  <div style="margin-top:6px;color:var(--sub)">data 폴더를 읽지 못하면(파일로 직접 연 경우) 과목 JSON을 여기서 고르세요.</div>
+</details>
+</div>
+
+<div id="cards"></div>
+</main>
+<script>
+const NAMES=['korean','english','chongchang','social','moral','practical','math','art','integrated','science','music','pe'];
+const SRC={bg:'백구',wi:'위더스',ku:'쿠키넷',te:'테크니컬',im:'임고트'};
+const ORDER=['bg','wi','ku','te','im'];
+const MK={'◎':1,'○':2,'△':3,'✕':4,'—':5};
+const KEY='gachejeom_v1';
+let subjects=[],items=[],view='all',filter='all';
+const QS={},OPEN=new Set(),PGDIR='assets/exam/';
+const pgSrc=id=>PGDIR+id+'.jpg';
+let S={j:{},m:{}};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+const dispute=q=>q.dispute===true;
+function groups(q){
+  return ORDER.map(s=>({s,rows:q.answers.filter(a=>a.src===s)})).filter(g=>g.rows.length);
+}
+// 출처 1개 = 한 블록: 출처명 1회 | 답안 칸(◎·○) | 비고 칸(note·cond·△·✕·ref, 중복 문장은 1번만)
+function srcHTML(gr){
+  const lead=gr.rows.filter(a=>a.mk==='◎'||a.mk==='○'||a.mk==='—');
+  const side=gr.rows.filter(a=>a.mk==='△'||a.mk==='✕');
+  const ans=lead.length?lead.map(a=>`<div class="a"><b class="mk mk${MK[a.mk]}">${a.mk}</b><div class="ans">${esc(a.text)||'—'}</div></div>`).join('')
+    :`<div class="a"><b class="mk mk5">—</b><div class="ans"></div></div>`;
+  const blocks=[],seen=new Set();
+  const add=t=>{t=(t||'').trim();if(t&&!seen.has(t)){seen.add(t);blocks.push(t)}};
+  lead.forEach(a=>add(a.note));
+  let nt=blocks.map(b=>`<div class="blk">${esc(b)}</div>`).join('');
+  nt+=side.map(a=>`<div class="blk ex"><b class="mk mk${MK[a.mk]}">${a.mk}</b><div>${esc(a.text)}${a.note?`\n${esc(a.note)}`:''}${a.cond?`<small>조건: ${esc(a.cond)}</small>`:''}</div></div>`).join('');
+  const refs=[...new Set(gr.rows.map(a=>a.ref).filter(Boolean))];
+  if(refs.length)nt+=`<small class="ref">${refs.map(esc).join(' / ')}</small>`;
+  if(!nt)nt='<span class="none">—</span>';
+  return `<div class="src"><div class="who">${SRC[gr.s]}</div><div>${ans}</div><div class="nt">${nt}</div></div>`;
+}
+function qHTML(q){
+  const d=QS[q.sub+'|'+q.q];
+  if(!d)return '';
+  const pg=d.passages||[],op=OPEN.has(q.id);
+  const pgh=pg.length?`<button class="chipbtn pgbtn" data-pg="${q.id}" aria-expanded="${op}">${op?'시험지 접기':'시험지 보기'} (${pg.length}쪽)</button><div class="pages" ${op?'':'hidden'}>${pg.map(id=>`<img alt="시험지 ${esc(id)}" ${op?`src="${pgSrc(id)}"`:`data-src="${pgSrc(id)}"`} loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'nopg',textContent:'시험지 이미지를 찾지 못했습니다: '+this.alt}))">`).join('')}</div>`:'';
+  return `<div class="qbox">${d.intro?`<div class="intro"><b>${esc(q.q.split('-')[1])}.</b> ${esc(d.intro)}</div>`:''}<div class="stem">${esc(d.stem)}</div>${pgh}</div>`;
+}
+function cardHTML(q){
+  let h=`<section class="card" data-id="${q.id}"><div class="head"><div class="title"><b>${esc(q.label)}</b><span>${q.points}점${q.points_estimated?' (배점 추정)':''}</span>${dispute(q)?'<span class="tag t-d">쟁점</span>':''}</div>${dispute(q)&&q.dispute_note?`<div class="dn">${esc(q.dispute_note)}</div>`:''}</div>${qHTML(q)}<div class="body">`;
+  h+=`<div class="mine"><label for="m-${q.id}">내 답안</label><textarea id="m-${q.id}" data-id="${q.id}">${esc(S.m[q.id]||'')}</textarea><div class="judge">${[['O','○'],['T','△'],['X','✕']].map(([k,l])=>`<button data-id="${q.id}" data-j="${k}" aria-pressed="${S.j[q.id]===k}" aria-label="${l} 판정">${l}</button>`).join('')}</div></div>`;
+  h+=`<div class="srcs">${groups(q).map(srcHTML).join('')}</div></div></section>`;
+  return h;
+}
+function pts(list){
+  let mn=0,mx=0,done=0;
+  list.forEach(q=>{const j=S.j[q.id];if(!j)return;done++;if(j==='O'){mn+=q.points;mx+=q.points}else if(j==='T')mx+=q.points});
+  return {mn,mx,done,n:list.length,tot:list.reduce((a,q)=>a+q.points,0)};
+}
+function summary(){
+  const cur=view==='all'?items:items.filter(q=>q.sub===view);
+  const p=pts(cur);
+  let h=`<div><b>${p.mn} ~ ${p.mx}</b><span>최소 ~ 최대 / ${p.tot}점</span></div><div><b>${p.done}/${p.n}</b><span>판정 완료</span></div>`;
+  ['A','B'].forEach(f=>{const l=items.filter(q=>q.form===f);if(l.length){const x=pts(l);h+=`<div><b>${x.mn}~${x.mx}</b><span>${f}형 ${x.tot}점</span></div>`}});
+  document.getElementById('sum').innerHTML=h;
+}
+function render(){
+  const tabs=[['all','전체'],...subjects.map(s=>[s.subject,s.label])];
+  document.getElementById('tabs').innerHTML=tabs.map(([k,l])=>`<button class="chipbtn" data-v="${k}" aria-pressed="${view===k}">${l}</button>`).join('');
+  document.getElementById('filters').innerHTML=[['all','전체'],['dispute','쟁점만'],['open','미판정만']].map(([k,l])=>`<button class="chipbtn" data-f="${k}" aria-pressed="${filter===k}">${l}</button>`).join('');
+  let list=view==='all'?items:items.filter(q=>q.sub===view);
+  if(filter==='dispute')list=list.filter(dispute);
+  if(filter==='open')list=list.filter(q=>!S.j[q.id]);
+  document.getElementById('cards').innerHTML=list.length?list.map(cardHTML).join(''):'<div class="empty">조건에 맞는 문항이 없습니다.</div>';
+  summary();
+}
+function addSubject(d){
+  if(!d||!d.items||subjects.some(s=>s.subject===d.subject))return;
+  subjects.push({subject:d.subject,label:d.label});
+  Object.entries(d.questions||{}).forEach(([k,v])=>{QS[d.subject+'|'+k]=v});
+  d.items.forEach(q=>items.push(Object.assign({sub:d.subject},q)));
+  subjects.sort((a,b)=>NAMES.indexOf(a.subject)-NAMES.indexOf(b.subject));
+  items.sort((a,b)=>NAMES.indexOf(a.sub)-NAMES.indexOf(b.sub)||(a.form>b.form?1:a.form<b.form?-1:0));
+}
+document.addEventListener('click',e=>{
+  const t=e.target;
+  if(t.dataset.pg){
+    const id=t.dataset.pg,box=t.parentNode.querySelector('.pages');if(!box)return;
+    const open=box.hidden;box.hidden=!open;
+    if(open){OPEN.add(id);box.querySelectorAll('img[data-src]').forEach(i=>{i.src=i.dataset.src;i.removeAttribute('data-src')})}else OPEN.delete(id);
+    t.setAttribute('aria-expanded',open);t.textContent=(open?'시험지 접기':'시험지 보기')+' ('+box.children.length+'쪽)';
+  }
+  else if(t.dataset.j){const id=t.dataset.id;S.j[id]=S.j[id]===t.dataset.j?undefined:t.dataset.j;if(!S.j[id])delete S.j[id];save();
+    t.parentNode.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',S.j[id]===b.dataset.j));summary();if(filter==='open')render();}
+  else if(t.dataset.v){view=t.dataset.v;render()}
+  else if(t.dataset.f){filter=t.dataset.f;render()}
+});
+document.addEventListener('input',e=>{if(e.target.dataset.id&&e.target.tagName==='TEXTAREA'){S.m[e.target.dataset.id]=e.target.value;save()}});
+document.getElementById('imp').onclick=()=>{
+  let form='',n=0;
+  document.getElementById('paste').value.split(/\r?\n/).forEach(l=>{
+    let m=l.match(/^\s*([AB])형\s*\d+번/);if(m){form=m[1];return}
+    m=l.match(/^\s*(\d+(?:-\d+)+):\s*(.*)$/);if(!m||!form)return;
+    const k=form+'-'+m[1];
+    items.forEach(q=>{if(q.id===k||q.id.startsWith(k+'-')){S.m[q.id]=m[2];n++}});
+  });
+  save();render();alert(n+'개 카드에 답안을 넣었습니다.');
+};
+document.getElementById('reset').onclick=()=>{if(confirm('판정과 내 답안을 모두 지울까요?')){S={j:{},m:{}};save();render()}};
+document.getElementById('file').onchange=e=>{
+  [...e.target.files].forEach(f=>f.text().then(t=>{addSubject(JSON.parse(t));render()}));
+};
+Promise.all(NAMES.map(n=>fetch('data/'+n+'.json').then(r=>r.ok?r.json():null).catch(()=>null))).then(ds=>{
+  ds.forEach(addSubject);
+  if(!items.length)document.getElementById('filebox').hidden=false;
+  render();
+});
+</script>
+</body>
+</html>
